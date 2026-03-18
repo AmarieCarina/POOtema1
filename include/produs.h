@@ -1,7 +1,7 @@
-#ifndef EXAMPLE_H
-#define EXAMPLE_H
+#ifndef produs_h
+#define produs_h
 
-class Example {
+class produs {
     int x = 1;
     int y = 2;
     void f() const;
@@ -9,4 +9,4 @@ public:
     void g();
 };
 
-#endif // EXAMPLE_H
+#endif // produs_h
