@@ -149,13 +149,15 @@ public:
     std::string getNumeClient() const {
         return NumeClient;
     }
+    int getID() const {
+        return IDComanda;
+    }
     bool getStatus() const {
         return this->StatusProcesare;
     }
     friend void AplicaReducere(Comanda& c, int procent) {
         const double initial = CalculeazaTotal(c);
-        if (initial>300)
-            c.Total = initial*procent/100.0+initial;
+        c.Total = initial*procent/100.0+initial;
     }
 
     void Proceseaza() {
@@ -182,10 +184,10 @@ public:
         :Comenzi{Comenzi_}, Adrese{Adrese_}, NumeClienti {NumeClienti_}, StatusLivrare{StatusLivrare_} {}
 
     std::vector<Comanda> getComenzi()const {
-        return Comenzi;
+        return this->Comenzi;
     }
 
-    friend void IstoricClient(const Livrari Livrare, const std::string& Nume) {
+    friend void IstoricClient(const Livrari& Livrare, const std::string& Nume) {
         for (const Comanda& c : Livrare.Comenzi) {
             if (c.getNumeClient()==Nume) {
                 operator<<(std::cout,c);
@@ -209,6 +211,28 @@ public:
         }
     }
 
+    friend void getNumeTotiClientii(const Livrari& livrare) {
+        for (int index=0; index<livrare.Comenzi.size(); index++) {
+            std::cout<<" * "<<livrare.Comenzi[index].getNumeClient()<<" -> "<<index<<"\n";
+        }
+        std::cout<<"\n";
+    }
+    friend std::string getNumeDupaCod(const Livrari& livrare, const int cod) {
+        return livrare.Comenzi.at(cod).getNumeClient();
+    }
+    friend void AfiseazaToateComenzile(const Livrari& livrare) {
+        for (int index=0; index<livrare.Comenzi.size(); index++) {
+            operator<<(std::cout,livrare.Comenzi[index]);
+        }
+    }
+    friend Comanda& getComandaDupaID(Livrari& livrare, const int ID) {
+        for (int index=0; index<livrare.Comenzi.size(); index++) {
+            if (livrare.Comenzi[index].getID()==ID) {
+                return livrare.Comenzi[index];
+            }
+        }
+    }
+
 };
 
 int main() {
@@ -222,56 +246,81 @@ int main() {
     Produs p8(8,"Hortensie",700,"Garden SRL",30);
     Produs p9(9,"Crizantema",2000,"Expert SRL",6);
     Produs p10(10,"Alstroemeria",1200,"Exotic SRL",10);
+
     Comanda c1(1, "Popescu", "Card", {p1,p6}, {7,3}, true);
     Comanda c2(2,"Ionescu", "Cash", {p3,p5,p10}, {5,4,3},true);
     Comanda c3(3,"Popescu","Card",{p4,p6,p9},{3,4,5},true);
     Comanda c4(4,"Munteanu", "Cash", {p7,p8,p3},{3,2,3});
     Comanda c5(5,"Popescu","Card", {p7,p6,p5},{4,5,3},true);
     Comanda c6(6,"Olteanu", "Card", {p1,p9,p10},{5,3,4});
-    //std::cout<<p0.getDenumire()<<"\n";
-    //operator<<(std::cout,c1);
-    //AplicaReducere(c1,10);
+
     c1.setTotal();
     c2.setTotal();
     c3.setTotal();
     c4.setTotal();
     c5.setTotal();
     c6.setTotal();
-    Livrari liv({c1,c2,c3,c4,c5},{"A1","A2","A3","A4","A5"},{"Popescu", "Ionescu", "Popescu", "Munteanu", "Popescu"},false);
-    //std::cout<<CalculeazaIncasari(liv);
-    ComenziDeLivrat(liv);
-    c1.Proceseaza();
-    c2.Proceseaza();
-    c3.Proceseaza();
-    c4.Proceseaza();
-    c5.Proceseaza();
+
+    Livrari liv({c1,c2,c3,c4,c5, c6},{"A1","A2","A3","A4","A5", "A6"},{"Popescu", "Ionescu", "Popescu", "Munteanu", "Popescu", "Olteanu"});
+
     c6.Proceseaza();
-    ComenziDeLivrat(liv);
-    //IstoricClient(liv,"Munteanu");
 
-
-    //e.push_back(elem) to add at the end;
-    //e.pop_back(elem) to remove from the end;
-
-    //////////////////////////////////////////////////de aici incepe codul de main//////
-    // std::cout<<"Selectati tipul de utilizator: [Client -> 0 | Manager -> 1 | Livrator -> 2]";
-    // char tipClient;
-    // std::cin>>tipClient;
-    // switch (tipClient) {
-    //     case '0': std::cout<<"\nBine ati venit, dle Client! \nCum va numiti?\n";
-    //             //listeaza toti clientii
-    //             std::cout<<"Selectati o optiune: [istoricClient() -> 0]";
-    //             //apeleaza istoricClient pentru clientul cu numele dat
-    //             break;
-    //     case '1': std::cout<<"\nBine ati venit, dle Manager! Selectati o optiune:\n [aplicaReducere -> 0 | calculeazaIncasari() -> 1]";
-    //             //listeaza toate comenzile, preia input si iar switch
-    //             break;
-    //     case '2': std::cout<<"\nBine ati venit, dle Curier! \nSelectati o optiune: [comenziDeLivrat() -> 0]";
-    //
-    //             break;
-    //     default: std::cout<<"\nAti introdus o tasta gresita!";break;
-    // }
-    /////////////////////////////////////////////////////////////////////////////////////
-
+    std::cout<<"Selectati tipul de utilizator: [Client -> 0 | Manager -> 1 | Livrator -> 2]\n";
+    char tipClient;
+    std::cin>>tipClient;
+    switch (tipClient) {
+        case '0': std::cout<<"\nBine ati venit, dle Client! \nCum va numiti?\n";
+                getNumeTotiClientii(liv);
+                char charClient;
+                std::cin>>charClient;
+                std::cout<<"D."<<getNumeDupaCod(liv,charClient-'0')<<",";
+                std::cout<<"Selectati o optiune: [istoricClient() -> 0]\n";
+                std::cin>>charClient;
+                switch (charClient) {
+                    //am ales switch, pentru a fi usor de adaugat functionalitati
+                    case'0': std::cout<<"Ati selectat istoricClient():\n";
+                        IstoricClient(liv,getNumeDupaCod(liv,charClient-'0'));
+                        break;
+                    default: std::cout<<"Nu exista aceasta optiune."; break;
+                }
+                break;
+        case '1': std::cout<<"\nBine ati venit, dle Manager! Selectati o optiune:\n [aplicaReducere() -> 0 | calculeazaIncasari() -> 1]";
+                char inputManager;
+                std::cin>>inputManager;
+                switch (inputManager) {
+                    case '0':
+                        std::cout<<"Ati selectat aplicaReducere(). Alegeti ID-ul comenzii careia i se va aplica reducerea:";
+                        AfiseazaToateComenzile(liv);
+                        int indexComanda;
+                        //////////////////////////////////////////de verificat ca indexComanda exista
+                        std::cin>>indexComanda;
+                        int procent;
+                        std::cout<<"Specificati procentul cu care sa fie redusa comanda aleasa: [type: int]";
+                        std::cin>>procent;
+                        AplicaReducere(getComandaDupaID(liv,indexComanda),procent);
+                        operator<<(std::cout,getComandaDupaID(liv,indexComanda));
+                        break;
+                    case '1':
+                        std::cout<<"Ati selectat calculeazaIncasari(). Incasarile pentru ultima livrare inregistrata sunt:\n";
+                        std::cout<<CalculeazaIncasari(liv)<<" RON";
+                        break;
+                    default:
+                        std::cout<<"Nu exista aceasta optiune."; break;
+                }
+                break;
+        case '2': std::cout<<"\nBine ati venit, dle Curier! \nSelectati o optiune: [comenziDeLivrat() -> 0]\n";
+                char inputLivrator;
+                std::cin>>inputLivrator;
+                switch (inputLivrator) {
+                    case '0':
+                        std::cout<<"Ati selectat comenziDeLivrat(). Adresele si clientii dvs de astazi sunt:\n";
+                        ComenziDeLivrat(liv);
+                        break;
+                    default: std::cout<<"Nu exista aceasta optiune."; break;
+                }
+                break;
+        default: std::cout<<"\nNu exista aceasta optiune.";break;
+    }
+    std::cout<<"Va uram o zi placuta!";
     return 0;
 }
