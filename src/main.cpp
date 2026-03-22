@@ -136,7 +136,7 @@ public:
     double getTotal() const{
         return Total;
     }
-    std::string getNumeClient() const {
+    const std::string& getNumeClient() const {
         return NumeClient;
     }
     long int getID() const {
