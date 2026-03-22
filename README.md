@@ -1,5 +1,5 @@
 ## Tema 1 | Florarie
-Student: Amarie Elena Carina, 2026
+Student: Amarie Elena Carina, grupa 132, 2026
 
 ##### Indicatie: fisierul sursa este `src/main.cpp`
 
@@ -45,7 +45,7 @@ Datele de intrare sunt specificate in functia `int main()` a programului, aceste
 - [ ] minim 52-60% din codul propriu să fie C++, `.gitattributes` configurat corect
 - [ ] tag de `git`: de exemplu `v0.1`
 - [x] serviciu de integrare continuă (CI) cu **toate bifele**; exemplu: GitHub Actions
-- [ ] code review #1 2 proiecte
+- [ ] code review #1 2 proiecte (in curs)
 
 ---
 
