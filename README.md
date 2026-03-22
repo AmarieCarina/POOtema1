@@ -42,10 +42,10 @@ Datele de intrare sunt specificate in functia `int main()` a programului, aceste
 - [x] implementarea a minim 3 funcții membru publice pentru funcționalități netriviale specifice temei alese, dintre care cel puțin 1-2 funcții mai complexe
 - [x] scenariu de utilizare **cu sens** a claselor definite:
   - crearea de obiecte și apelarea tuturor funcțiilor membru publice în main
-- [ ] minim 52-60% din codul propriu să fie C++, `.gitattributes` configurat corect
-- [ ] tag de `git`: de exemplu `v0.1`
+- [x] minim 52-60% din codul propriu să fie C++, `.gitattributes` configurat corect
+- [x] tag de `git`: de exemplu `v0.1`
 - [x] serviciu de integrare continuă (CI) cu **toate bifele**; exemplu: GitHub Actions
-- [ ] code review #1 2 proiecte (in curs)
+- [ ] code review #1 2 proiecte *(in curs de completare)*
 
 ---
 
