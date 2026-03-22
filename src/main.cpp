@@ -177,10 +177,9 @@ class Livrari {
         //vector continand adresele la care trebuie facuta livrarea
     std::vector<std::string>NumeClienti;
         //vector continand numele clientilor
-    bool StatusLivrare;
 public:
-    Livrari(const std::vector<Comanda>& Comenzi_, const std::vector<std::string>& Adrese_, const std::vector<std::string>& NumeClienti_, const bool StatusLivrare_=false)
-        :Comenzi{Comenzi_}, Adrese{Adrese_}, NumeClienti {NumeClienti_}, StatusLivrare{StatusLivrare_} {}
+    Livrari(const std::vector<Comanda>& Comenzi_, const std::vector<std::string>& Adrese_, const std::vector<std::string>& NumeClienti_)
+        :Comenzi{Comenzi_}, Adrese{Adrese_}, NumeClienti {NumeClienti_} {}
 
     const std::vector<Comanda>& getComenzi()const {
         return this->Comenzi;
