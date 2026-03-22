@@ -10,12 +10,16 @@ Presupunem existenta unei florarii care vinde buchete personalizate, trimise exc
 ### Functionalitati
 Functionalitatile proiectului depind de tipul utilizatorului. Astfel, pentru Client, Manager si Curier, sunt listate optiunile de functionare in cadrul unui meniu interactiv.
   - **Client**
-     - istoricul comenzilor plasate, in functie de numele clientului
+     - `friend void IstoricClient(const Livrari& Livrare, const std::string& Nume)`
+         - istoricul comenzilor plasate, in functie de numele clientului
   - **Manager**
-     - aplica reduceri anumitor comenzi, cu un procent dat (criteriile de acordare a reducerii sunt stabilite de promotia in curs a florariei)
-     - calculeaza totalul de incasari pentru ziua curenta
+     - `void AplicaReducere(int procent);`
+         - aplica reduceri anumitor comenzi, cu un procent dat (criteriile de acordare a reducerii sunt stabilite de promotia in curs a florariei)
+     - `friend double CalculeazaIncasari(const Livrari& livrare);`
+         - calculeaza totalul de incasari pentru ziua curenta
   - **Curier**
-     - comenzile gata de livrat, impreuna cu toate informatiile necesare
+     - `friend void ComenziDeLivrat(const Livrari& livrare);`
+         - comenzile gata de livrat, impreuna cu toate informatiile necesare
 
 ---
 
