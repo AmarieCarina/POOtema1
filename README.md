@@ -43,7 +43,7 @@ Datele de intrare sunt specificate in functia `int main()` a programului, aceste
   - crearea de obiecte și apelarea tuturor funcțiilor membru publice în main
 - [ ] minim 52-60% din codul propriu să fie C++, `.gitattributes` configurat corect
 - [ ] tag de `git`: de exemplu `v0.1`
-- [ ] serviciu de integrare continuă (CI) cu **toate bifele**; exemplu: GitHub Actions
+- [x] serviciu de integrare continuă (CI) cu **toate bifele**; exemplu: GitHub Actions
 - [ ] code review #1 2 proiecte
 
 ---
