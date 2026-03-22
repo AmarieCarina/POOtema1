@@ -1,6 +1,7 @@
 ## Tema 1 | Florarie
-Student: Amarie Elena Carina
-2026
+Student: Amarie Elena Carina, 2026
+
+##### Indicatie: fisierul sursa este `src/main.cpp`
 
 ---
 
