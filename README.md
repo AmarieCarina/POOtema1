@@ -2,6 +2,8 @@
 Student: Amarie Elena Carina
 2026
 
+---
+
 ### Descrierea claselor implementate
 Presupunem existenta unei florarii care vinde buchete personalizate, trimise exclusiv prin livrare la adresa. Florile sunt reprezentate de obiecte din clasa `Produs`, avand specificate un identificator unic, denumirea florii, furnizorul, pretul si stocul disponibil. Clientul isi alege florile dorite si lanseaza o comanda, iar produsul final este un buchet cu toate aceste produse. O comanda poate avea un singur buchet; daca clientul isi doreste mai multe buchete, poate da mai multe comenzi. Comenzile sunt obiecte ale clasei `Comanda`, ce contine florile dorite, cantitatea dorita din fiecare produs, suma totala de platit, metoda de plata si statusul comenzii: procesat/neprocesat. Gestiunea comenzilor se face in functie de ziua in care a fost plasata comanda. Un obiect al clasei `Livrare` reprezinta totalul comenzilor plasate intr o zi, ce contine informatii utile pentru curier: comenzile destinate livrarii din ziua respectiva (depinzand de statusul comenzii), adresele de livrare corespunzatoare si numele clientilor. 
 
@@ -28,7 +30,7 @@ Datele de intrare sunt specificate in functia `int main()` a programului, aceste
 
 ---
 
-## Lista de cerinte
+### Lista de cerinte
 - [x] Nume proiect
 - [x] Scurtă descriere a temei alese
 - [x] definirea a minim **3-4 clase** folosind compunere cu clasele definite de voi; moștenirile nu se iau în considerare aici
@@ -44,7 +46,8 @@ Datele de intrare sunt specificate in functia `int main()` a programului, aceste
 - [ ] serviciu de integrare continuă (CI) cu **toate bifele**; exemplu: GitHub Actions
 - [ ] code review #1 2 proiecte
 
+---
 
-## License
+### License
 The project is licensed under [AGPLv3](LICENSE).
 The [template repository](https://github.com/mcmarius/oop-template) itself is licensed under [Unlicense](LICENSE.template).
