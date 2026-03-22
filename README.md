@@ -4,7 +4,7 @@ Student: Amarie Elena Carina
 
 ### Descrierea claselor implementate
 Presupunem existenta unei florarii care vinde buchete personalizate, trimise exclusiv prin livrare la adresa. Florile sunt reprezentate de obiecte din clasa `Produs`, avand specificate un identificator unic, denumirea florii, furnizorul, pretul si stocul disponibil. Clientul isi alege florile dorite si lanseaza o comanda, iar produsul final este un buchet cu toate aceste produse. O comanda poate avea un singur buchet; daca clientul isi doreste mai multe buchete, poate da mai multe comenzi. Comenzile sunt obiecte ale clasei `Comanda`, ce contine florile dorite, cantitatea dorita din fiecare produs, suma totala de platit, metoda de plata si statusul comenzii: procesat/neprocesat. Gestiunea comenzilor se face in functie de ziua in care a fost plasata comanda. Un obiect al clasei `Livrare` reprezinta totalul comenzilor plasate intr o zi, ce contine informatii utile pentru curier: comenzile pretendente la a fi livrate in ziua respectiva (depinzand de statusul comenzii), adresele de livrare corespunzatoare si numele clientilor. 
----
+**
 ### Functionalitati
 Functionalitatile proiectului depind de tipul utilizatorului. Astfel, pentru Client, Manager si Curier, sunt listate optiunile de functionare in cadrul unui meniu interactiv.
   * Client
