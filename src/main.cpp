@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 class Produs {
+    //produse ale florariei: tipuri de flori
     long int IDProdus; ///cod identificare
     std::string Denumire;
     long int Stoc; ///nr de produse disponibile
@@ -41,7 +42,7 @@ public:
         return *this;
     }
 
-    ///operator<< folosind functie prieten
+    ///operator<<, functie prieten
     friend std::ostream& operator<<(std::ostream& os, const Produs& p) {
         os<<"\nIDProdus: "<<p.IDProdus<<"\n";
         os<<"Denumire: "<<p.Denumire<<"\n";
@@ -51,29 +52,36 @@ public:
         return os;
     }
     //operator-, definit special pentru afisarea denumirii unui produs, in cadrul afisarii clasei Comanda
+    //am folosit operatorul - pentru a exersa supraincarcarea operatorilor
+    //simbolul e folosit pentru a sugera "micsorarea" outputului de afisare a intregului obiect, comparativ cu op<<
     friend std::ostream& operator-(std::ostream& os, const Produs& p) {
         os<<"Denumire produs: "<<p.Denumire<<"; ";
         return os;
     }
+    //getter Pret -> folosit la CalculeazaTotal()
+    //pentru a accesa o data membra privata intr o functie externa
     double getPret() const {
         return this->Pret;
     }
 
-    ///destructor
+    ///destructorul implicit
     ~Produs() {
         //std::cout<<"Destructor- Produs\n";
     }
 };
 
 class Comanda {
+    //echivalentul unui buchet ce contine mai multe flori
+    //am considerat redundant sa implementez o noua clasa Buchet, care nu ar fi adus beneficii in implementarea metodelor non-triviale
+
     long int IDComanda; //pentru identificare unica a comenzii
-    std::string NumeClient; //cine a facut comanda
+    std::string NumeClient; //cine a facut comanda; util in identificare in IstoricClient()
     std::string MetodaPlata; //plata la livrare sau online
     bool StatusProcesare; //procesat-> 1; neprocesat-> 0
     std::vector<Produs> Produse; //produsele corespunzatoare comenzii
     std::vector<int> Cantitati;
     //vector de intregi cu cantitati- un buchet nu poate avea decat un numar intreg de flori
-    double Total;
+    double Total; //actualizat separat prin metoda CalculeazaTotal()
 public:
     ///constuctor de initializare, fara parametri
     Comanda() {
@@ -89,17 +97,20 @@ public:
     ///constructor parametrizat, folosind lista de initializare
     ///StatusProcesare - valoare implicita false
     ///Total - valoare implicita 0.0
+    ///astfel, unui obiect nou i se seteaza automat totalul si statusul
     Comanda(const long int IDComanda_, const std::string& NumeClient_, const std::string& MetodaPlata_, const std::vector<Produs>& Produse_, const std::vector<int>& Cantitati_, const bool StatusProcesare_=false, const double Total_=0.0)
         :IDComanda{IDComanda_},NumeClient{NumeClient_},MetodaPlata{MetodaPlata_},StatusProcesare{StatusProcesare_}, Produse{Produse_},Cantitati {Cantitati_}, Total{Total_}{
         //std::cout<<"Constructor cu parametri- Comanda\n";
     }
+    //constructor de copiere, cu lista de initializare
     Comanda(const Comanda& other)
         :IDComanda{other.IDComanda}, NumeClient{other.NumeClient}, MetodaPlata{other.MetodaPlata}, StatusProcesare{other.StatusProcesare}, Produse{other.Produse}, Cantitati{other.Cantitati}, Total{other.Total}{
         //std::cout<<"Constructor de copiere- Comanda\n";
     }
+    //operator= de copiere
     Comanda& operator=(const Comanda& other) {
-        if (this == &other) {
-            return *this;
+        if (this == &other) { //trateaza cazul in care se incearca sa se copieze un obiect in el insusi
+            return *this; //se ignora
         }
         IDComanda=other.IDComanda;
         NumeClient=other.NumeClient;
@@ -110,8 +121,8 @@ public:
         Total=other.Total;
         return *this;
     }
-    ///reprezentare obiecte ca strings
-    ///operator<< pentru afisare
+    ///reprezentare obiecte ca strings:
+    ///operator<< pentru afisare, cu apel catre operatorul- pentru afisarea denumirii produsului, in loc de toate datele produsului
     friend std::ostream& operator<<(std::ostream& os, const Comanda& obj){
         os<<"\nIDComanda: "<<obj.IDComanda<<"\n";
         os<<"NumeClient: "<<obj.NumeClient<<"\n";
@@ -128,49 +139,67 @@ public:
     }
 
     ///functionalitati:
-    double CalculeazaTotal() const; //prototip
+    double CalculeazaTotal() const; //prototipul functiei externe
 
+    //setter, folosit pentru modificarea datelor membre din clasa dupa apelul CalculeazaTotal()
     void setTotal() {
         this->Total=CalculeazaTotal();
     }
+
+    //getter, folosit pentur acces la datele private in cadrul apelilui CalculeazaIncasari()
     double getTotal() const{
         return Total;
     }
+
+    //getter, folosit pentru preluare a datelor private in apelul metodelor/functiilor:
+    //IstoricClient(), ComenziDeLivrat(), getNumeTotiClientii(), getNumeDupaCod()
     const std::string& getNumeClient() const {
         return NumeClient;
     }
+
+    //getter, folosit la getComandaDupaID()
     long int getID() const {
         return IDComanda;
     }
+
+    //getter, folosit la ComenziDeLivrat()
     bool getStatus() const {
         return this->StatusProcesare;
     }
 
-    void AplicaReducere(int procent);
+    void AplicaReducere(int procent); //prototip al unei functii externe
 
+    //metoda pentru schimbare a statusului de procesare, cu modificare in obiect
     void Proceseaza() {
         if (this->StatusProcesare == false) {
             this->StatusProcesare = true;
-            std::cout<<"Succes!\n";
+            //std::cout<<"Succes!\n";
         }
-        else
-            std::cout<<"Comanda deja procesata!\n";
+        //else
+            //std::cout<<"Comanda deja procesata!\n";
     }
+
+    //destructorul implicit
     ~Comanda() = default;
+
 };
+//metoda pentru actualizare a totalului de plata
 double Comanda::CalculeazaTotal() const {
     double total=0;
-    for (size_t i=0; i < Produse.size(); i++) {
-        total+=Produse[i].getPret()*Cantitati[i];
+    for (size_t i=0; i < Produse.size(); i++) { //pentru fiecare produs din comanda
+        total+=Produse[i].getPret()*Cantitati[i]; //calcul al totalului
     }
     return total;
 }
+
+//metoda utilizata de Manager, dupa criterii proprii, avand ca utilitate modificarea totalului unei comenzi
 void Comanda::AplicaReducere(int procent) {
     const double initial = CalculeazaTotal();
     Total = initial-initial*procent/100.0;
 }
 
 class Livrari {
+    //comenzile acumulate in ziua curenta, continand date utile curierului
     std::vector<Comanda>Comenzi;
         //vector continand obiecte de tip Comanda; conditie de apartenenta: campul statusProcesare == true
     std::vector<std::string>Adrese;
@@ -178,9 +207,11 @@ class Livrari {
     std::vector<std::string>NumeClienti;
         //vector continand numele clientilor
 public:
+    //constructor parametrizat, cu lista de initializare
     Livrari(const std::vector<Comanda>& Comenzi_, const std::vector<std::string>& Adrese_, const std::vector<std::string>& NumeClienti_)
         :Comenzi{Comenzi_}, Adrese{Adrese_}, NumeClienti {NumeClienti_} {}
 
+    //functie prieten, desemnata Clientului, ce apeleaza operatorul<< de afisare
     friend void IstoricClient(const Livrari& Livrare, const std::string& Nume) {
         for (const Comanda& c : Livrare.Comenzi) {
             if (c.getNumeClient()==Nume) {
@@ -188,6 +219,7 @@ public:
             }
         }
     }
+    //functie prieten, desemnata Managerului, pentru analiza incasarilor zilnice
     friend double CalculeazaIncasari(const Livrari& livrare) {
         double total=0;
         for (const Comanda& c:livrare.Comenzi) {
@@ -196,6 +228,7 @@ public:
         return total;
     }
 
+    //functie prieten, desemnata Curierului, pentru a configurarea traseului zilnic
     friend void ComenziDeLivrat(const Livrari& livrare) {
         for (size_t index=0; index<livrare.Comenzi.size(); index++) {
             if (livrare.Comenzi[index].getStatus()==true) {
@@ -205,33 +238,44 @@ public:
         }
     }
 
+    //functie pentru afisarea optiunilor
+    //faciliteaza meniul interactiv
     friend void getNumeTotiClientii(const Livrari& livrare) {
         for (size_t index=0; index<livrare.Comenzi.size(); index++) {
             std::cout<<" * "<<livrare.Comenzi[index].getNumeClient()<<" -> "<<index<<"\n";
         }
         std::cout<<"\n";
     }
+
+    //functie pentru identificare NumeClient, in functie de inputul minimalist al utilizatorului
     friend std::string getNumeDupaCod(const Livrari& livrare, const int cod) {
         return livrare.Comenzi.at(cod).getNumeClient();
     }
+
+    //functie pentru afisarea optiunilor
+    //faciliteaza meniul interactiv
     friend void AfiseazaToateComenzile(const Livrari& livrare) {
         for (size_t index=0; index<livrare.Comenzi.size(); index++) {
             operator<<(std::cout,livrare.Comenzi[index]);
         }
     }
+    //functie pentru identificare Comanda, in functie de inputul minimalist al utilizatorului
+    //returneaza pointer catre un obiect de tip comanda, pentru a trata cazul in care inputul utilizatorului este invalid
     friend Comanda* getComandaDupaID(Livrari& livrare, const int ID) {
         for (size_t index=0; index<livrare.Comenzi.size(); index++) {
             if (livrare.Comenzi[index].getID()==ID) {
-                return &livrare.Comenzi[index];
+                return &livrare.Comenzi[index]; //returneaza adresa obiectului Comanda
             }
         }
-        return nullptr;
+        return nullptr; //daca nu s a gasit ID-ul
+        //acest caz nu va fi niciodata atins, dar a fost implementat pentru corectitudinea definirii functiei
+        //tratarea cazului se face in main, cu mesaj corespunzator si evitarea apelului functiei
     }
 
 };
 
 int main() {
-    //
+    //datele membre:
     Produs p1(1,"Trandafir",1000,"Florar SRL",10);
     Produs p2(2,"Lalea",2000, "Flori SRL", 7);
     Produs p3(3,"Orhidee",800,"Exotic SRL",40);
@@ -250,6 +294,7 @@ int main() {
     Comanda c5(5,"Anghel","Card", {p7,p6,p5},{4,5,3},true);
     Comanda c6(6,"Olteanu", "Card", {p1,p9,p10},{5,3,4});
 
+    //actualizeaza totalul pentru comenzile curente:
     c1.setTotal();
     c2.setTotal();
     c3.setTotal();
@@ -257,6 +302,7 @@ int main() {
     c5.setTotal();
     c6.setTotal();
 
+    //comenzile pentru ziua curenta
     Livrari liv({c1,c2,c3,c4,c5, c6},
         {"Str. Lalelelor nr. 12, bl. A3, sc. 1, et. 2, ap. 15, Bucuresti, Sector 3",
             "Str. Baba Novac nr. 22, bl. M12, sc. 1, et. 3, ap. 21, Bucuresti, Sector 3",
@@ -266,18 +312,20 @@ int main() {
             "Calea 13 Septembrie nr. 98, bl. P7, sc. 1, et. 2, ap. 9, Bucuresti, Sector 5"},
             {"Popescu", "Ionescu", "Popescu", "Munteanu", "Popescu", "Olteanu"});
 
+    //schimbare StatusProcesare al unei comenzi
     c6.Proceseaza();
 
+    //////////////////////////  M E N I U    I N T E R A C T I V  //////////////////////////////////////////
     std::cout<<"Bine ati venit!\n Selectati tipul de utilizator:\n[Client -> 0 | Manager -> 1 | Curier -> 2]\n";
     char tipUtilizator;
     std::cin>>tipUtilizator;
     switch (tipUtilizator) {
-        case '0': std::cout<<"\nBine ati venit, dle Client! \nCum va numiti?\n";
+        case '0': std::cout<<"Bine ati venit, dle Client! \nCum va numiti?\n";
                 getNumeTotiClientii(liv);
                 int inputClient;
                 std::cin>>inputClient;
                 std::cout<<"D."<<getNumeDupaCod(liv,inputClient)<<",";
-                std::cout<<"Selectati o optiune: [istoricClient() -> 0]\n";
+                std::cout<<"selectati o optiune: [istoricClient() -> 0]\n";
                 std::cin>>inputClient;
                 switch (inputClient) {
                     //am ales switch, pentru a fi usor de adaugat functionalitati noi
@@ -288,7 +336,7 @@ int main() {
                 }
                 break;
 
-        case '1': std::cout<<"\nBine ati venit, dle Manager! Selectati o optiune:\n [aplicaReducere() -> 0 | calculeazaIncasari() -> 1]";
+        case '1': std::cout<<"Bine ati venit, dle Manager! Selectati o optiune:\n [aplicaReducere() -> 0 | calculeazaIncasari() -> 1]";
                 char inputManager;
                 std::cin>>inputManager;
 
@@ -304,6 +352,7 @@ int main() {
                         std::cin>>procent;
 
                         Comanda* comandaDeModificat=getComandaDupaID(liv,indexComanda);
+
                         if (comandaDeModificat != nullptr) {
                             comandaDeModificat->AplicaReducere(procent);
                             std::cout<<*comandaDeModificat;
@@ -323,7 +372,7 @@ int main() {
                 }
                 break;
 
-        case '2': std::cout<<"\nBine ati venit, dle Curier! \nSelectati o optiune: [comenziDeLivrat() -> 0]\n";
+        case '2': std::cout<<"Bine ati venit, dle Curier! \nSelectati o optiune: [comenziDeLivrat() -> 0]\n";
                 char inputLivrator;
                 std::cin>>inputLivrator;
 
