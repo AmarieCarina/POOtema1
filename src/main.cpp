@@ -268,8 +268,8 @@ public:
             }
         }
         return nullptr; //daca nu s a gasit ID-ul
-        //acest caz nu va fi niciodata atins, dar a fost implementat pentru corectitudinea definirii functiei
-        //tratarea cazului se face in main, cu mesaj corespunzator si evitarea apelului functiei
+        //implementat pentru corectitudinea definirii functiei
+        //tratarea cazului se face in main, cu mesaj corespunzator
     }
 
 };
@@ -315,46 +315,78 @@ int main() {
     //schimbare StatusProcesare al unei comenzi
     c6.Proceseaza();
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////  M E N I U    I N T E R A C T I V  //////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
     std::cout<<"Bine ati venit!\n Selectati tipul de utilizator:\n[Client -> 0 | Manager -> 1 | Curier -> 2]\n";
+    //input optiunea utilizatorului
     char tipUtilizator;
     std::cin>>tipUtilizator;
+
+    //pentru toate variantele de input:
     switch (tipUtilizator) {
+        //cazul Client
         case '0': std::cout<<"Bine ati venit, dle Client! \nCum va numiti?\n";
+                //afisare toate numele de clienti disponibile, pentru a fi mai usor utilizatorului sa aleaga
                 getNumeTotiClientii(liv);
+
+                //input optiunea utilizatorului
                 int inputClient;
                 std::cin>>inputClient;
+
+                //afisare corespunzatoare
                 std::cout<<"D."<<getNumeDupaCod(liv,inputClient)<<",";
+                //urmatoarea optiune
                 std::cout<<"selectati o optiune: [istoricClient() -> 0]\n";
+
+                //input optiunea utilizatorului
                 std::cin>>inputClient;
+
+                //tratare toate cazurile de input
+                //am ales switch, pentru a fi usor de adaugat functionalitati noi
                 switch (inputClient) {
-                    //am ales switch, pentru a fi usor de adaugat functionalitati noi
+                    //cazul primei functii
                     case 0: std::cout<<"Ati selectat istoricClient():\n";
                         IstoricClient(liv,getNumeDupaCod(liv,inputClient));
                         break;
+                    //orice alt caz
                     default: std::cout<<"Nu exista aceasta optiune."; break;
                 }
                 break;
 
+        //cazul Manager
         case '1': std::cout<<"Bine ati venit, dle Manager! Selectati o optiune:\n [aplicaReducere() -> 0 | calculeazaIncasari() -> 1]";
+                //preluare input utilizator - optiunea dorita
                 char inputManager;
                 std::cin>>inputManager;
 
+                //pentru toate cazurile de input
                 switch (inputManager) {
+                    //cazul primei functii
                     case '0': {
                         std::cout<<"Ati selectat aplicaReducere(). Alegeti ID-ul comenzii careia i se va aplica reducerea:";
+
+                        //afisare toate comenzile curente, pentru a alege mai usor
                         AfiseazaToateComenzile(liv);
-                        int indexComanda;
+
                         //preluare indexul dorit
+                        int indexComanda;
                         std::cin>>indexComanda;
+
+                        //preluare procentul dorit
                         int procent;
                         std::cout<<"Specificati procentul cu care sa fie redusa comanda aleasa: [type: int]";
                         std::cin>>procent;
 
+                        //gasire comanda corespunzatoare indexului dat
                         Comanda* comandaDeModificat=getComandaDupaID(liv,indexComanda);
 
+                        //tratarea cazului in care indexul comenzii nu exista
                         if (comandaDeModificat != nullptr) {
+                            //comanda este trimisa mai departe catre metoda definita
                             comandaDeModificat->AplicaReducere(procent);
+                            //afisare corespunzatoare
                             std::cout<<*comandaDeModificat;
                         }
                         else {
@@ -362,31 +394,41 @@ int main() {
                         }
                         break;
                     }
+                    //cazul pentru a doua functie implementata
                     case '1':
-                        std::cout<<"Ati selectat calculeazaIncasari(). Incasarile pentru ultima livrare inregistrata sunt:\n";
+                        std::cout<<"Ati selectat calculeazaIncasari(). Incasarile totale pentru ultima livrare inregistrata sunt:\n";
+                        //apelul functiei, cu mesaj corespunzator
                         std::cout<<CalculeazaIncasari(liv)<<" RON";
                         break;
 
+                    //pentru orice alt input
                     default:
                         std::cout<<"Nu exista aceasta optiune."; break;
                 }
                 break;
 
+        //cazul Curier
         case '2': std::cout<<"Bine ati venit, dle Curier! \nSelectati o optiune: [comenziDeLivrat() -> 0]\n";
+
+                //preluare optiune dorita
                 char inputLivrator;
                 std::cin>>inputLivrator;
 
+                //pentru toate cazurile de input
                 switch (inputLivrator) {
+                    //cazul primei functii
                     case '0':
                         std::cout<<"Ati selectat comenziDeLivrat(). Adresele si clientii dvs de astazi sunt:\n";
                         ComenziDeLivrat(liv);
                         break;
+                    //pentru orice alt input
                     default: std::cout<<"Nu exista aceasta optiune."; break;
                 }
                 break;
 
+            //pentru orice alt input
         default: std::cout<<"\nNu exista aceasta optiune.";break;
     }
-    std::cout<<"\nVa uram o zi placuta!";
+    std::cout<<"\nVa uram o zi placuta!"; //mesaj de incheiere
     return 0;
 }
