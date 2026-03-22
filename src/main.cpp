@@ -276,10 +276,10 @@ int main() {
 
     c6.Proceseaza();
 
-    std::cout<<"Selectati tipul de utilizator: [Client -> 0 | Manager -> 1 | Livrator -> 2]\n";
-    char tipClient;
-    std::cin>>tipClient;
-    switch (tipClient) {
+    std::cout<<"Bine ati venit!\n Selectati tipul de utilizator:\n[Client -> 0 | Manager -> 1 | Curier -> 2]\n";
+    char tipUtilizator;
+    std::cin>>tipUtilizator;
+    switch (tipUtilizator) {
         case '0': std::cout<<"\nBine ati venit, dle Client! \nCum va numiti?\n";
                 getNumeTotiClientii(liv);
                 int inputClient;
