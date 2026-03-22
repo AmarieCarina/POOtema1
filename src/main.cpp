@@ -181,13 +181,6 @@ public:
     Livrari(const std::vector<Comanda>& Comenzi_, const std::vector<std::string>& Adrese_, const std::vector<std::string>& NumeClienti_)
         :Comenzi{Comenzi_}, Adrese{Adrese_}, NumeClienti {NumeClienti_} {}
 
-    const std::vector<Comanda>& getComenzi()const {
-        return this->Comenzi;
-    }
-    size_t getComandaSize()const {
-        return this->Comenzi.size();
-    }
-
     friend void IstoricClient(const Livrari& Livrare, const std::string& Nume) {
         for (const Comanda& c : Livrare.Comenzi) {
             if (c.getNumeClient()==Nume) {
@@ -288,7 +281,7 @@ int main() {
                 std::cin>>inputClient;
                 switch (inputClient) {
                     //am ales switch, pentru a fi usor de adaugat functionalitati noi
-                    case'0': std::cout<<"Ati selectat istoricClient():\n";
+                    case 0: std::cout<<"Ati selectat istoricClient():\n";
                         IstoricClient(liv,getNumeDupaCod(liv,inputClient));
                         break;
                     default: std::cout<<"Nu exista aceasta optiune."; break;
