@@ -1,6 +1,14 @@
-## Tema 1
+## Tema 1 | Florarie
+Student: Amarie Elena Carina
+2026
 
-- [ ] Nume proiect (poate fi schimbat ulterior)
+### Descrierea claselor implementate
+Presupunem existenta unei florarii care vinde buchete personalizate, trimise exclusiv prin livrare la adresa. Florile sunt reprezentate de obiecte din clasa `Produs`, avand specificate un identificator unic, denumirea florii, furnizorul, pretul si stocul disponibil. Clientul isi alege florile dorite si lanseaza o comanda, iar produsul final este un buchet cu toate aceste produse. O comanda poate avea un singur buchet; daca clientul isi doreste mai multe buchete, poate da mai multe comenzi. Comenzile sunt obiecte ale clasei `Comanda`, ce contine florile dorite, cantitatea dorita din fiecare produs, suma totala de platit, metoda de plata si statusul comenzii: procesat/neprocesat. Gestiunea comenzilor se face in functie de ziua in care a fost plasata comanda. Un obiect al clasei `Livrare` reprezinta totalul comenzilor plasate intr o zi, ce contine informatii utile pentru curier: comenzile pretendente la a fi livrate in ziua respectiva (depinzand de statusul comenzii), adresele de livrare corespunzatoare si numele clientilor. 
+
+### Functionalitati
+
+
+- [x] Nume proiect (poate fi schimbat ulterior)
 - [ ] Scurtă descriere a temei alese, ce v-ați propus să implementați
 - [ ] definirea a minim **3-4 clase** folosind compunere cu clasele definite de voi; moștenirile nu se iau în considerare aici
 - [ ] constructori de inițializare cu parametri pentru fiecare clasă
@@ -25,5 +33,3 @@
 The project is licensed under [AGPLv3](LICENSE).
 
 The [template repository](https://github.com/mcmarius/oop-template) itself is licensed under [Unlicense](LICENSE.template).
-
-## Resurse
