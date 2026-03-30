@@ -1,47 +1,87 @@
 #include <iostream>
-#include <vector>
-#include <string>
+#include <cstring>
 class Produs {
     //produse ale florariei: tipuri de flori
     long int IDProdus; ///cod identificare
-    std::string Denumire;
+    char* Denumire;
     long int Stoc; ///nr de produse disponibile
-    std::string Furnizor;
+    char* Furnizor;
     double Pret; ///nr real reprezentand costul
 public:
-    Produs() { ///constructor de initializare, fara parametri
-        this->Denumire="";
-        this->IDProdus = 0;
-        this->Stoc = 0;
-        this->Furnizor="";
-        this->Pret=0.0;
-        std::cout<<"Constructor de initializare- Produs\n";
+    Produs() : IDProdus{0}, Stoc{0}, Pret{0.0}{ ///constructor de initializare, fara parametri
+        this->Denumire=new char[1];
+        Denumire[0]='\0';
+
+        this->Furnizor=new char[1];
+        Furnizor[0]='\0';
+
+        //std::cout<<"Constructor de initializare- Produs\n";
     }
     ///constructor cu parametri, folosind lista de initializare
-    Produs(const long int IDProdus_, const std::string& Denumire_, const long int Stoc_, const std::string& Furnizor_, const double Pret_)
-        : IDProdus{IDProdus_}, Denumire{Denumire_}, Stoc{Stoc_}, Furnizor{Furnizor_}, Pret{Pret_} {
+    Produs(long int IDProdus_, const char* Denumire_, long Stoc_, const char* Furnizor_, double Pret_)
+        : IDProdus{IDProdus_}, Stoc{Stoc_}, Pret{Pret_} {
+
+        Denumire=new char[strlen(Denumire_)+1];
+        strcpy(Denumire,Denumire_);
+
+        Furnizor=new char[strlen(Furnizor_)+1];
+        strcpy(Furnizor,Furnizor_);
+
         //std::cout<<"Constructor cu parametri- Produs\n";
     }
 
     ///constructor de copiere, folosind lista de initializare
     Produs(const Produs& other)
-        :IDProdus{other.IDProdus}, Denumire{other.Denumire}, Stoc{other.Stoc}, Furnizor{other.Furnizor}, Pret{other.Pret} {
+        :IDProdus{other.IDProdus}, Stoc{other.Stoc}, Pret{other.Pret} {
+        Denumire = new char[strlen(other.Denumire)+1];
+        strcpy(Denumire,other.Denumire);
+
+        Furnizor = new char[strlen(other.Furnizor)+1];
+        strcpy(Furnizor,other.Furnizor);
         //std::cout<<"Constructor de copiere- Produs\n";
     }
 
     ///operator= de copiere
     Produs& operator=(const Produs& other) {
-        if (this == &other)
-                {return *this;}
-        IDProdus=other.IDProdus;
-        Denumire=other.Denumire;
-        Stoc=other.Stoc;
-        Furnizor=other.Furnizor;
-        Pret=other.Pret;
+        if (this != &other) {
+            delete[] Denumire;
+            delete[] Furnizor;
+
+            IDProdus=other.IDProdus;
+            Stoc=other.Stoc;
+            Pret=other.Pret;
+
+            //alocal memorie noua si copiem sirul de caractere
+            if (other.Denumire!=nullptr) {
+                Denumire=new char[strlen(other.Denumire)+1];
+                strcpy(Denumire,other.Denumire);
+            }
+            else {
+                Denumire=new char[1];
+                Denumire[0]='\0';
+            }
+
+            if (other.Furnizor!=nullptr) {
+                Furnizor=new char[strlen(other.Furnizor)+1];
+                strcpy(Furnizor,other.Furnizor);
+            }
+            else {
+                Furnizor=new char[1];
+                Furnizor[0]='\0';
+            }
+        }
         //std::cout<<"Operator= copiere- Produs\n";
         return *this;
     }
-
+    void ModificaStoc(int cantitate) {
+        if (this->Stoc >= cantitate) {
+            this->Stoc-=cantitate;
+        }
+        else {
+            this->Stoc=0;
+            std::cout<<"Atentie! Stoc insuficient pentru produsul "<<Denumire<<"!\n";
+        }
+    }
     ///operator<<, functie prieten
     friend std::ostream& operator<<(std::ostream& os, const Produs& p) {
         os<<"\nIDProdus: "<<p.IDProdus<<"\n";
@@ -64,8 +104,10 @@ public:
         return this->Pret;
     }
 
-    ///destructorul implicit
+    ///destructorul
     ~Produs() {
+        delete[] Denumire;
+        delete[] Furnizor;
         //std::cout<<"Destructor- Produs\n";
     }
 };
@@ -75,50 +117,106 @@ class Comanda {
     //am considerat redundant sa implementez o noua clasa Buchet, care nu ar fi adus beneficii in implementarea metodelor non-triviale
 
     long int IDComanda; //pentru identificare unica a comenzii
-    std::string NumeClient; //cine a facut comanda; util in identificare in IstoricClient()
-    std::string MetodaPlata; //plata la livrare sau online
+    char* NumeClient; //cine a facut comanda; util in identificare in IstoricClient()
+    char* MetodaPlata; //plata la livrare sau online
     bool StatusProcesare; //procesat-> 1; neprocesat-> 0
-    std::vector<Produs> Produse; //produsele corespunzatoare comenzii
-    std::vector<int> Cantitati;
+    Produs* Produse; //produsele corespunzatoare comenzii
+    int* Cantitati;
+    int NrProduse;
     //vector de intregi cu cantitati- un buchet nu poate avea decat un numar intreg de flori
     double Total; //actualizat separat prin metoda CalculeazaTotal()
+
 public:
-    ///constuctor de initializare, fara parametri
-    Comanda() {
-        this->IDComanda = 0;
-        this->NumeClient = "";
-        this->Produse.clear();
-        this->Cantitati.clear();
-        this->MetodaPlata = "";
-        this->StatusProcesare = false;
-        this->Total = 0;
-    }
+    //constructor de initializare, fara parametri
+    Comanda(): IDComanda(0), NumeClient(nullptr), MetodaPlata(nullptr), StatusProcesare(false), Produse(nullptr), Cantitati(nullptr), NrProduse(0), Total(0.0) {}
 
     ///constructor parametrizat, folosind lista de initializare
     ///StatusProcesare - valoare implicita false
     ///Total - valoare implicita 0.0
     ///astfel, unui obiect nou i se seteaza automat totalul si statusul
-    Comanda(const long int IDComanda_, const std::string& NumeClient_, const std::string& MetodaPlata_, const std::vector<Produs>& Produse_, const std::vector<int>& Cantitati_, const bool StatusProcesare_=false, const double Total_=0.0)
-        :IDComanda{IDComanda_},NumeClient{NumeClient_},MetodaPlata{MetodaPlata_},StatusProcesare{StatusProcesare_}, Produse{Produse_},Cantitati {Cantitati_}, Total{Total_}{
+    Comanda(long int IDComanda_, const char* NumeClient_, const char* MetodaPlata_, Produs* Produse_, int NrProduse_, const int* Cantitati_)
+        :IDComanda{IDComanda_},StatusProcesare{false}, Produse{Produse_}, NrProduse{NrProduse_}, Total{0.0}{
+        NumeClient = new char[strlen(NumeClient_)+1];
+        strcpy(NumeClient,NumeClient_);
+
+        MetodaPlata = new char[strlen(MetodaPlata_)+1];
+        strcpy(MetodaPlata,MetodaPlata_);
+
+        Produse = new Produs[NrProduse];
+        Cantitati=new int[NrProduse];
+
+        for (size_t i=0;i<NrProduse;i++) {
+            Produse[i] = Produse_[i];
+            Cantitati[i] = Cantitati_[i];
+        }
         //std::cout<<"Constructor cu parametri- Comanda\n";
     }
     //constructor de copiere, cu lista de initializare
     Comanda(const Comanda& other)
-        :IDComanda{other.IDComanda}, NumeClient{other.NumeClient}, MetodaPlata{other.MetodaPlata}, StatusProcesare{other.StatusProcesare}, Produse{other.Produse}, Cantitati{other.Cantitati}, Total{other.Total}{
+        :IDComanda{other.IDComanda}, StatusProcesare{other.StatusProcesare}, NrProduse{other.NrProduse}, Total{other.Total}{
+        NumeClient = new char[strlen(other.NumeClient)+1];
+        strcpy(NumeClient,other.NumeClient);
+
+        MetodaPlata = new char[strlen(other.MetodaPlata)+1];
+        strcpy(MetodaPlata, other.MetodaPlata);
+
+        Produse = new Produs[other.NrProduse];
+        Cantitati = new int[other.NrProduse];
+
+        for (size_t i=0; i<other.NrProduse; i++) {
+            Produse[i] = other.Produse[i];
+            Cantitati[i] = other.Cantitati[i];
+        }
         //std::cout<<"Constructor de copiere- Comanda\n";
     }
     //operator= de copiere
     Comanda& operator=(const Comanda& other) {
-        if (this == &other) { //trateaza cazul in care se incearca sa se copieze un obiect in el insusi
-            return *this; //se ignora
+        if (this != &other) { //trateaza cazul in care se incearca sa se copieze un obiect in el insusi
+            delete[] NumeClient;
+            delete[] MetodaPlata;
+            delete[] Produse;
+            delete[] Cantitati;
+
+            IDComanda=other.IDComanda;
+            StatusProcesare=other.StatusProcesare;
+            NrProduse=other.NrProduse;
+            Total=other.Total;
+
+            //deep copy pentru NumeClient
+            if (other.NumeClient) {
+                NumeClient=new char[strlen(other.NumeClient)+1];
+                strcpy(NumeClient,other.NumeClient);
+            }
+            else {
+                NumeClient=nullptr;
+            }
+
+            if (other.MetodaPlata) {
+                MetodaPlata=new char[strlen(other.MetodaPlata)+1];
+                strcpy(MetodaPlata,other.MetodaPlata);
+            }
+            else {
+                MetodaPlata=nullptr;
+            }
+
+            //deep copy pentru vectorul de Produse
+            if (other.Produse) {
+                Produse=new Produs[other.NrProduse];
+                for (size_t i=0;i<other.NrProduse;i++) {
+                    Produse[i] = other.Produse[i];
+                }
+            }
+            else Produse=nullptr;
+
+            //deep copy pentru vectorul de cantitati
+            if (other.Cantitati) {
+                Cantitati=new int[other.NrProduse];
+                for (size_t i=0;i<other.NrProduse;i++) {
+                    Cantitati[i] = other.Cantitati[i];
+                }
+            }
+        else Cantitati=nullptr;
         }
-        IDComanda=other.IDComanda;
-        NumeClient=other.NumeClient;
-        MetodaPlata=other.MetodaPlata;
-        StatusProcesare=other.StatusProcesare;
-        Produse=other.Produse;
-        Cantitati=other.Cantitati;
-        Total=other.Total;
         return *this;
     }
     ///reprezentare obiecte ca strings:
@@ -128,141 +226,153 @@ public:
         os<<"NumeClient: "<<obj.NumeClient<<"\n";
         os<<"MetodaPlata: "<<obj.MetodaPlata<<"\n";
         os<<"StatusProcesare: "<<obj.StatusProcesare<<"\n";
-        size_t indexCantitate=0;
-        for (const Produs& produs : obj.Produse) {
-            operator-(os, produs);
-            os<<"Cantitate: "<<obj.Cantitati[indexCantitate]<<"\n";
-            indexCantitate++;
+        for (size_t i=0;i<obj.NrProduse;i++) {
+            operator-(os, obj.Produse[i]);
+            os<<"Cantitate: "<<obj.Cantitati[i]<<"\n";
         }
-        os<<"Total comanda: "<<obj.Total<<"\n";
+        os<<"Total comanda: "<<obj.Total<<" RON \n";
         return os;
     }
 
     ///functionalitati:
-    double CalculeazaTotal() const; //prototipul functiei externe
-
     //setter, folosit pentru modificarea datelor membre din clasa dupa apelul CalculeazaTotal()
-    void setTotal() {
-        this->Total=CalculeazaTotal();
-    }
+    void setTotal() { this->Total=CalculeazaTotal();}
 
     //getter, folosit pentur acces la datele private in cadrul apelilui CalculeazaIncasari()
-    double getTotal() const{
-        return Total;
-    }
+    double getTotal() const{ return Total;}
 
     //getter, folosit pentru preluare a datelor private in apelul metodelor/functiilor:
     //IstoricClient(), ComenziDeLivrat(), getNumeTotiClientii(), getNumeDupaCod()
-    const std::string& getNumeClient() const {
-        return NumeClient;
-    }
+    const char* getNumeClient() const { return NumeClient; }
 
     //getter, folosit la getComandaDupaID()
-    long int getID() const {
-        return IDComanda;
-    }
+    long int getID() const { return IDComanda;}
 
     //getter, folosit la ComenziDeLivrat()
-    bool getStatus() const {
-        return this->StatusProcesare;
-    }
+    bool getStatus() const { return this->StatusProcesare;}
 
-    void AplicaReducere(int procent); //prototip al unei functii externe
+    //metoda utilizata de Manager, dupa criterii proprii, avand ca utilitate modificarea totalului unei comenzi
+    void AplicaReducere(int procent) {
+        if (procent < 0 || procent > 100) return; // Validare minimă
+
+        double initial = CalculeazaTotal();
+        // calculam reducerea folosind double, ca să nu pierdem precizia
+        double valoareReducere = (initial * (double)procent) / 100.0;
+
+        this->Total = initial - valoareReducere;
+    }
 
     //metoda pentru schimbare a statusului de procesare, cu modificare in obiect
     void Proceseaza() {
         if (this->StatusProcesare == false) {
+            for (size_t i = 0; i < this->NrProduse; i++) {
+                Produse[i].ModificaStoc(Cantitati[i]);
+            }
             this->StatusProcesare = true;
             //std::cout<<"Succes!\n";
         }
         //else
             //std::cout<<"Comanda deja procesata!\n";
     }
-
+    //metoda pentru actualizare a totalului de plata
+    double CalculeazaTotal() const {
+        double total=0;
+        for (size_t i=0; i < NrProduse; i++) { //pentru fiecare produs din comanda
+            total+=Produse[i].getPret()*Cantitati[i]; //calcul al totalului
+        }
+        return total;
+    }
     //destructorul implicit
-    ~Comanda() = default;
+    ~Comanda() {
+        delete[] NumeClient;
+        delete[] MetodaPlata;
+        delete[] Produse;
+        delete[] Cantitati;
+    }
 
 };
-//metoda pentru actualizare a totalului de plata
-double Comanda::CalculeazaTotal() const {
-    double total=0;
-    for (size_t i=0; i < Produse.size(); i++) { //pentru fiecare produs din comanda
-        total+=Produse[i].getPret()*Cantitati[i]; //calcul al totalului
-    }
-    return total;
-}
-
-//metoda utilizata de Manager, dupa criterii proprii, avand ca utilitate modificarea totalului unei comenzi
-void Comanda::AplicaReducere(int procent) {
-    const double initial = CalculeazaTotal();
-    Total = initial-initial*procent/100.0;
-}
 
 class Livrari {
     //comenzile acumulate in ziua curenta, continand date utile curierului
-    std::vector<Comanda>Comenzi;
-        //vector continand obiecte de tip Comanda; conditie de apartenenta: campul statusProcesare == true
-    std::vector<std::string>Adrese;
-        //vector continand adresele la care trebuie facuta livrarea
-    std::vector<std::string>NumeClienti;
-        //vector continand numele clientilor
+    Comanda* Comenzi;
+        //obiecte de tip Comanda; conditie de apartenenta: campul statusProcesare == true
+    char** Adrese;
+        //adresele la care trebuie facuta livrarea
+    int NrComenzi;
+    char** NumeClienti;
+        //numele clientilor
 public:
     //constructor parametrizat, cu lista de initializare
-    Livrari(const std::vector<Comanda>& Comenzi_, const std::vector<std::string>& Adrese_, const std::vector<std::string>& NumeClienti_)
-        :Comenzi{Comenzi_}, Adrese{Adrese_}, NumeClienti {NumeClienti_} {}
+    Livrari(Comanda* Comenzi_, const char** Adrese_, const char** NumeClienti_, int NrComenzi_)
+        :NrComenzi {NrComenzi_} {
+        Comenzi = new Comanda[NrComenzi_];
+        Adrese = new char*[NrComenzi_];
+        NumeClienti = new char*[NrComenzi_];
 
-    //functie prieten, desemnata Clientului, ce apeleaza operatorul<< de afisare
-    friend void IstoricClient(const Livrari& Livrare, const std::string& Nume) {
-        for (const Comanda& c : Livrare.Comenzi) {
-            if (c.getNumeClient()==Nume) {
-                operator<<(std::cout,c);
+        for (size_t i=0;i<NrComenzi;i++) {
+            Comenzi[i] = Comenzi_[i];
+            Adrese[i] = new char[strlen(Adrese_[i])+1];
+            strcpy(Adrese[i], Adrese_[i]);
+            NumeClienti[i] = new char[strlen(NumeClienti_[i])+1];
+            strcpy(NumeClienti[i], NumeClienti_[i]);
+        }
+    }
+
+    //functie desemnata Clientului, ce apeleaza operatorul<< de afisare
+    static void IstoricClient(const Livrari& Livrare, const char* Nume) {
+        for (size_t i=0;i<Livrare.NrComenzi; i++) {
+            if (strcmp(Livrare.Comenzi[i].getNumeClient(), Nume)==0) {
+                operator<<(std::cout,Livrare.Comenzi[i]);
             }
         }
     }
     //functie prieten, desemnata Managerului, pentru analiza incasarilor zilnice
-    friend double CalculeazaIncasari(const Livrari& livrare) {
+    static double CalculeazaIncasari(const Livrari& Livrare) {
         double total=0;
-        for (const Comanda& c:livrare.Comenzi) {
-            total+=c.getTotal();
+        for (size_t i=0; i < Livrare.NrComenzi; i++) {
+            total+=Livrare.Comenzi[i].getTotal();
         }
         return total;
     }
 
     //functie prieten, desemnata Curierului, pentru a configurarea traseului zilnic
-    friend void ComenziDeLivrat(const Livrari& livrare) {
-        for (size_t index=0; index<livrare.Comenzi.size(); index++) {
-            if (livrare.Comenzi[index].getStatus()==true) {
-                std::cout<<livrare.Comenzi[index].getNumeClient()<<" | ";
-                std::cout<<livrare.Adrese[index]<<std::endl;
+    static void ComenziDeLivrat(const Livrari& Livrare) {
+        for (size_t index=0; index<Livrare.NrComenzi; index++) {
+            if (Livrare.Comenzi[index].getStatus()==true) {
+                std::cout<<Livrare.Comenzi[index].getNumeClient()<<" | ";
+                std::cout<<Livrare.Adrese[index]<<std::endl;
             }
         }
     }
 
-    //functie pentru afisarea optiunilor
+    //functie prieten pentru afisarea optiunilor
     //faciliteaza meniul interactiv
     friend void getNumeTotiClientii(const Livrari& livrare) {
-        for (size_t index=0; index<livrare.Comenzi.size(); index++) {
+        for (size_t index=0; index<livrare.NrComenzi; index++) {
             std::cout<<" * "<<livrare.Comenzi[index].getNumeClient()<<" -> "<<index<<"\n";
         }
         std::cout<<"\n";
     }
 
     //functie pentru identificare NumeClient, in functie de inputul minimalist al utilizatorului
-    friend std::string getNumeDupaCod(const Livrari& livrare, const int cod) {
-        return livrare.Comenzi.at(cod).getNumeClient();
+    friend const char* getNumeDupaCod(const Livrari& livrare, int cod) {
+        if (cod>=0 && cod<livrare.NrComenzi) {
+            return livrare.Comenzi[cod].getNumeClient();
+        }
+        return "Necunoscut";
     }
 
     //functie pentru afisarea optiunilor
     //faciliteaza meniul interactiv
     friend void AfiseazaToateComenzile(const Livrari& livrare) {
-        for (size_t index=0; index<livrare.Comenzi.size(); index++) {
+        for (size_t index=0; index<livrare.NrComenzi; index++) {
             operator<<(std::cout,livrare.Comenzi[index]);
         }
     }
     //functie pentru identificare Comanda, in functie de inputul minimalist al utilizatorului
     //returneaza pointer catre un obiect de tip comanda, pentru a trata cazul in care inputul utilizatorului este invalid
     friend Comanda* getComandaDupaID(Livrari& livrare, const int ID) {
-        for (size_t index=0; index<livrare.Comenzi.size(); index++) {
+        for (size_t index=0; index<livrare.NrComenzi; index++) {
             if (livrare.Comenzi[index].getID()==ID) {
                 return &livrare.Comenzi[index]; //returneaza adresa obiectului Comanda
             }
@@ -270,6 +380,15 @@ public:
         return nullptr; //daca nu s a gasit ID-ul
         //implementat pentru corectitudinea definirii functiei
         //tratarea cazului se face in main, cu mesaj corespunzator
+    }
+    ~Livrari() {
+        for (size_t index=0; index<NrComenzi; index++) {
+            delete[] Adrese[index];
+            delete[] NumeClienti[index];
+        }
+        delete[] Adrese;
+        delete[] NumeClienti;
+        delete[] Comenzi;
     }
 
 };
@@ -287,33 +406,49 @@ int main() {
     Produs p9(9,"Crizantema",2000,"Expert SRL",6);
     Produs p10(10,"Alstroemeria",1200,"Exotic SRL",10);
 
-    Comanda c1(1, "Popescu", "Card", {p1,p6}, {7,3}, true);
-    Comanda c2(2,"Ionescu", "Cash", {p3,p5,p10}, {5,4,3},true);
-    Comanda c3(3,"Popescu","Card",{p4,p6,p9},{3,4,5},true);
-    Comanda c4(4,"Munteanu", "Cash", {p7,p8,p3},{3,2,3});
-    Comanda c5(5,"Anghel","Card", {p7,p6,p5},{4,5,3},true);
-    Comanda c6(6,"Olteanu", "Card", {p1,p9,p10},{5,3,4});
+    Produs pr1[]={p1,p6}; int ct1[]={7,3};
+    Comanda c1(1, "Popescu", "Card", pr1, 2, ct1);
+
+    Produs pr2[]={p3,p5,p10}; int ct2[]={5,4,3};
+    Comanda c2(2,"Ionescu", "Cash", pr2, 3, ct2);
+
+    Produs pr3[]={p4,p6,p9}; int ct3[]={3,4,5};
+    Comanda c3(3,"Popescu","Card",pr3,3,ct3);
+
+    Produs pr4[]={p7,p8,p3}; int ct4[]={3,2,3};
+    Comanda c4(4,"Munteanu", "Cash", pr4,3, ct4);
+
+    Produs pr5[]={p7,p6,p5}; int ct5[]={4,5,3};
+    Comanda c5(5,"Anghel","Card", pr5,3,ct5);
+
+    Produs pr6[]={p1,p9,p10}; int ct6[]={5,3,4};
+    Comanda c6(6,"Olteanu", "Card", pr6,3,ct6);
 
     //actualizeaza totalul pentru comenzile curente:
-    c1.setTotal();
-    c2.setTotal();
-    c3.setTotal();
-    c4.setTotal();
-    c5.setTotal();
-    c6.setTotal();
-
-    //comenzile pentru ziua curenta
-    Livrari liv({c1,c2,c3,c4,c5, c6},
-        {"Str. Lalelelor nr. 12, bl. A3, sc. 1, et. 2, ap. 15, Bucuresti, Sector 3",
-            "Str. Baba Novac nr. 22, bl. M12, sc. 1, et. 3, ap. 21, Bucuresti, Sector 3",
-            "Str. Drumul Taberei nr. 84, bl. T5, sc. 2, et. 7, ap. 63, Bucuresti, Sector 6",
-            "Bd. Dimitrie Cantemir nr. 15, bl. C1, sc. A, et. 4, ap. 18, Bucuresti, Sector 4",
-            "Sos. Colentina nr. 120, bl. K3, sc. 3, et. 6, ap. 54, Bucuresti, Sector 2",
-            "Calea 13 Septembrie nr. 98, bl. P7, sc. 1, et. 2, ap. 9, Bucuresti, Sector 5"},
-            {"Popescu", "Ionescu", "Popescu", "Munteanu", "Popescu", "Olteanu"});
+    c1.setTotal();  c2.setTotal();
+    c3.setTotal();  c4.setTotal();
+    c5.setTotal();  c6.setTotal();
 
     //schimbare StatusProcesare al unei comenzi
     c6.Proceseaza();
+    c5.Proceseaza();
+    c3.Proceseaza();
+
+
+    //comenzile pentru ziua curenta
+    Comanda Comenzi_zi[]={c1,c2,c3,c4,c5,c6};
+    const char* Adrese[]={
+        "Str. Lalelelor nr. 12, bl. A3, sc. 1, et. 2, ap. 15, Bucuresti, Sector 3",
+        "Str. Baba Novac nr. 22, bl. M12, sc. 1, et. 3, ap. 21, Bucuresti, Sector 3",
+        "Str. Drumul Taberei nr. 84, bl. T5, sc. 2, et. 7, ap. 63, Bucuresti, Sector 6",
+        "Bd. Dimitrie Cantemir nr. 15, bl. C1, sc. A, et. 4, ap. 18, Bucuresti, Sector 4",
+        "Sos. Colentina nr. 120, bl. K3, sc. 3, et. 6, ap. 54, Bucuresti, Sector 2",
+        "Calea 13 Septembrie nr. 98, bl. P7, sc. 1, et. 2, ap. 9, Bucuresti, Sector 5"
+    };
+    const char* Clienti[]={"Popescu", "Ionescu", "Popescu", "Munteanu", "Popescu", "Olteanu"};
+    Livrari liv(Comenzi_zi, Adrese, Clienti,6);
+
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////  M E N I U    I N T E R A C T I V  //////////////////////////////////////////
@@ -332,8 +467,7 @@ int main() {
                 getNumeTotiClientii(liv);
 
                 //input optiunea utilizatorului
-                int inputClient;
-                std::cin>>inputClient;
+                int inputClient; std::cin>>inputClient;
 
                 //afisare corespunzatoare
                 std::cout<<"D."<<getNumeDupaCod(liv,inputClient)<<",";
@@ -341,14 +475,14 @@ int main() {
                 std::cout<<"selectati o optiune: [istoricClient() -> 0]\n";
 
                 //input optiunea utilizatorului
-                std::cin>>inputClient;
+                int optiuneClient; std::cin>>optiuneClient;
 
                 //tratare toate cazurile de input
                 //am ales switch, pentru a fi usor de adaugat functionalitati noi
-                switch (inputClient) {
+                switch (optiuneClient) {
                     //cazul primei functii
                     case 0: std::cout<<"Ati selectat istoricClient():\n";
-                        IstoricClient(liv,getNumeDupaCod(liv,inputClient));
+                        Livrari::IstoricClient(liv,getNumeDupaCod(liv,inputClient));
                         break;
                     //orice alt caz
                     default: std::cout<<"Nu exista aceasta optiune."; break;
@@ -358,8 +492,7 @@ int main() {
         //cazul Manager
         case '1': std::cout<<"Bine ati venit, dle Manager! Selectati o optiune:\n [aplicaReducere() -> 0 | calculeazaIncasari() -> 1]";
                 //preluare input utilizator - optiunea dorita
-                char inputManager;
-                std::cin>>inputManager;
+                char inputManager; std::cin>>inputManager;
 
                 //pentru toate cazurile de input
                 switch (inputManager) {
@@ -398,7 +531,7 @@ int main() {
                     case '1':
                         std::cout<<"Ati selectat calculeazaIncasari(). Incasarile totale pentru ultima livrare inregistrata sunt:\n";
                         //apelul functiei, cu mesaj corespunzator
-                        std::cout<<CalculeazaIncasari(liv)<<" RON";
+                        std::cout<<Livrari::CalculeazaIncasari(liv)<<" RON";
                         break;
 
                     //pentru orice alt input
@@ -411,15 +544,14 @@ int main() {
         case '2': std::cout<<"Bine ati venit, dle Curier! \nSelectati o optiune: [comenziDeLivrat() -> 0]\n";
 
                 //preluare optiune dorita
-                char inputLivrator;
-                std::cin>>inputLivrator;
+                char inputLivrator; std::cin>>inputLivrator;
 
                 //pentru toate cazurile de input
                 switch (inputLivrator) {
                     //cazul primei functii
                     case '0':
                         std::cout<<"Ati selectat comenziDeLivrat(). Adresele si clientii dvs de astazi sunt:\n";
-                        ComenziDeLivrat(liv);
+                        Livrari::ComenziDeLivrat(liv);
                         break;
                     //pentru orice alt input
                     default: std::cout<<"Nu exista aceasta optiune."; break;
