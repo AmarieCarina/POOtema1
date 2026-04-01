@@ -145,7 +145,7 @@ public:
         Produse = new Produs[NrProduse];
         Cantitati=new int[NrProduse];
 
-        for (size_t i=0; i<NrProduse; i++) {
+        for (int i=0; i<NrProduse; i++) {
             Produse[i] = Produse_[i];
             Cantitati[i] = Cantitati_[i];
         }
@@ -163,7 +163,7 @@ public:
         Produse = new Produs[other.NrProduse];
         Cantitati = new int[other.NrProduse];
 
-        for (size_t i=0; i<other.NrProduse; i++) {
+        for (int i=0; i<other.NrProduse; i++) {
             Produse[i] = other.Produse[i];
             Cantitati[i] = other.Cantitati[i];
         }
@@ -202,7 +202,7 @@ public:
             //deep copy pentru vectorul de Produse
             if (other.Produse) {
                 Produse=new Produs[other.NrProduse];
-                for (size_t i=0;i<other.NrProduse;i++) {
+                for (int i=0;i<other.NrProduse;i++) {
                     Produse[i] = other.Produse[i];
                 }
             }
@@ -211,7 +211,7 @@ public:
             //deep copy pentru vectorul de cantitati
             if (other.Cantitati) {
                 Cantitati=new int[other.NrProduse];
-                for (size_t i=0;i<other.NrProduse;i++) {
+                for (int i=0;i<other.NrProduse;i++) {
                     Cantitati[i] = other.Cantitati[i];
                 }
             }
@@ -226,7 +226,7 @@ public:
         os<<"NumeClient: "<<obj.NumeClient<<"\n";
         os<<"MetodaPlata: "<<obj.MetodaPlata<<"\n";
         os<<"StatusProcesare: "<<obj.StatusProcesare<<"\n";
-        for (size_t i=0;i<obj.NrProduse;i++) {
+        for (int i=0;i<obj.NrProduse;i++) {
             operator-(os, obj.Produse[i]);
             os<<"Cantitate: "<<obj.Cantitati[i]<<"\n";
         }
@@ -269,7 +269,7 @@ public:
     //metoda pentru schimbare a statusului de procesare, cu modificare in obiect
     void Proceseaza() {
         if (this->StatusProcesare == false) {
-            for (size_t i = 0; i < this->NrProduse; i++) {
+            for (int i = 0; i < this->NrProduse; i++) {
                 Produse[i].ModificaStoc(Cantitati[i]);
             }
             this->StatusProcesare = true;
@@ -281,7 +281,7 @@ public:
     //metoda pentru actualizare a totalului de plata
     double CalculeazaTotal() const {
         double total=0;
-        for (size_t i=0; i < NrProduse; i++) { //pentru fiecare produs din comanda
+        for (int i=0; i < NrProduse; i++) { //pentru fiecare produs din comanda
             total+=Produse[i].getPret()*Cantitati[i]; //calcul al totalului
         }
         int taxaTransport = 15;
@@ -322,7 +322,7 @@ public:
         Adrese = new char*[NrComenzi_];
         NumeClienti = new char*[NrComenzi_];
 
-        for (size_t i=0;i<NrComenzi;i++) {
+        for (int i=0;i<NrComenzi;i++) {
             Comenzi[i] = Comenzi_[i];
             Adrese[i] = new char[strlen(Adrese_[i])+1];
             strcpy(Adrese[i], Adrese_[i]);
@@ -333,7 +333,7 @@ public:
 
     //functie desemnata Clientului, ce apeleaza operatorul<< de afisare
     static void IstoricClient(const Livrari& Livrare, const char* Nume) {
-        for (size_t i=0;i<Livrare.NrComenzi; i++) {
+        for (int i=0;i<Livrare.NrComenzi; i++) {
             if (strcmp(Livrare.Comenzi[i].getNumeClient(), Nume)==0) {
                 operator<<(std::cout,Livrare.Comenzi[i]);
             }
@@ -342,7 +342,7 @@ public:
     //functie prieten, desemnata Managerului, pentru analiza incasarilor zilnice
     static double CalculeazaIncasari(const Livrari& Livrare) {
         double total=0;
-        for (size_t i=0; i < Livrare.NrComenzi; i++) {
+        for (int i=0; i < Livrare.NrComenzi; i++) {
             total+=Livrare.Comenzi[i].getTotal();
         }
         return total;
@@ -350,7 +350,7 @@ public:
 
     //functie prieten, desemnata Curierului, pentru a configurarea traseului zilnic
     static void ComenziDeLivrat(const Livrari& Livrare) {
-        for (size_t index=0; index<Livrare.NrComenzi; index++) {
+        for (int index=0; index<Livrare.NrComenzi; index++) {
             if (Livrare.Comenzi[index].getStatus()==true) {
                 std::cout<<Livrare.Comenzi[index].getNumeClient()<<" | ";
                 std::cout<<Livrare.Adrese[index]<<std::endl;
@@ -362,7 +362,7 @@ public:
     //functie prieten pentru afisarea optiunilor
     //faciliteaza meniul interactiv
     friend void getNumeTotiClientii(const Livrari& livrare) {
-        for (size_t index=0; index<livrare.NrComenzi; index++) {
+        for (int index=0; index<livrare.NrComenzi; index++) {
             std::cout<<" * "<<livrare.Comenzi[index].getNumeClient()<<" -> "<<index<<"\n";
         }
         std::cout<<"\n";
@@ -379,14 +379,14 @@ public:
     //functie pentru afisarea optiunilor
     //faciliteaza meniul interactiv
     friend void AfiseazaToateComenzile(const Livrari& livrare) {
-        for (size_t index=0; index<livrare.NrComenzi; index++) {
+        for (int index=0; index<livrare.NrComenzi; index++) {
             operator<<(std::cout,livrare.Comenzi[index]);
         }
     }
     //functie pentru identificare Comanda, in functie de inputul minimalist al utilizatorului
     //returneaza pointer catre un obiect de tip comanda, pentru a trata cazul in care inputul utilizatorului este invalid
     friend Comanda* getComandaDupaID(Livrari& livrare, const int ID) {
-        for (size_t index=0; index<livrare.NrComenzi; index++) {
+        for (int index=0; index<livrare.NrComenzi; index++) {
             if (livrare.Comenzi[index].getID()==ID) {
                 return &livrare.Comenzi[index]; //returneaza adresa obiectului Comanda
             }
@@ -396,7 +396,7 @@ public:
         //tratarea cazului se face in main, cu mesaj corespunzator
     }
     ~Livrari() {
-        for (size_t index=0; index<NrComenzi; index++) {
+        for (int index=0; index<NrComenzi; index++) {
             delete[] Adrese[index];
             delete[] NumeClienti[index];
         }
