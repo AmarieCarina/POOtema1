@@ -316,7 +316,7 @@ class Livrari {
     char** NumeClienti; //numele clientilor
 public:
     //constructor parametrizat, cu lista de initializare
-    Livrari(Comanda* Comenzi_, const char** Adrese_, const char** NumeClienti_, int NrComenzi_)
+    Livrari(const Comanda* Comenzi_, const char** Adrese_, const char** NumeClienti_, int NrComenzi_)
         :NrComenzi {NrComenzi_} {
         Comenzi = new Comanda[NrComenzi_];
         Adrese = new char*[NrComenzi_];
