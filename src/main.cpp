@@ -330,6 +330,25 @@ public:
             strcpy(NumeClienti[i], NumeClienti_[i]);
         }
     }
+    Livrari(const Livrari& other) {
+        this->NrComenzi = other.NrComenzi;
+
+        //alocam memorie noua pentru vectori
+        this->Comenzi= new Comanda[other.NrComenzi];
+        this->Adrese= new char*[other.NrComenzi];
+        this->NumeClienti = new char*[other.NrComenzi];
+
+        //deep copy pentru fiecare element
+        for (int i=0;i<other.NrComenzi;i++) {
+            this->Comenzi[i] = other.Comenzi[i];
+
+            this->Adrese[i] = new char[strlen(other.Adrese[i])+1];
+            strcpy(this->Adrese[i], other.Adrese[i]);
+
+            this->NumeClienti[i] = new char[strlen(other.NumeClienti[i])+1];
+            strcpy(this->NumeClienti[i], other.NumeClienti[i]);
+        }
+    }
 
     Livrari& operator=(const Livrari& other) {
         if (this!=&other) {
