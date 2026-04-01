@@ -331,6 +331,41 @@ public:
         }
     }
 
+    Livrari& operator=(const Livrari& other) {
+        if (this!=&other) {
+            for (int index = 0; index < NrComenzi; index++) {
+                delete[] Adrese[index];
+                delete[] NumeClienti[index];
+            }
+            delete[] Comenzi;
+            delete[] Adrese;
+            delete[] NumeClienti;
+
+            //valoare primitiva
+            NrComenzi=other.NrComenzi;
+
+            //alocam memorie noua
+            this->Comenzi=new Comanda[other.NrComenzi];
+            this->Adrese=new char*[other.NrComenzi];
+            this->NumeClienti=new char*[other.NrComenzi];
+
+            //deep copy pentru fiecare element
+            if (other.NumeClienti) {
+                for (int i=0;i<other.NrComenzi;i++) {
+                    Comenzi[i] = other.Comenzi[i];
+
+                    Adrese[i]=new char[strlen(other.Adrese[i])+1];
+                    strcpy(Adrese[i], other.Adrese[i]);
+
+                    NumeClienti[i]=new char[strlen(other.NumeClienti[i])+1];
+                    strcpy(NumeClienti[i], other.NumeClienti[i]);
+                }
+            }
+            else NumeClienti=nullptr;
+        }
+        return *this;
+    }
+
     //functie desemnata Clientului, ce apeleaza operatorul<< de afisare
     static void IstoricClient(const Livrari& Livrare, const char* Nume) {
         for (int i=0;i<Livrare.NrComenzi; i++) {
