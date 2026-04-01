@@ -8,7 +8,8 @@ class Produs {
     char* Furnizor;
     double Pret; ///nr real reprezentand costul
 public:
-    Produs() : IDProdus{0}, Stoc{0}, Pret{0.0}{ ///constructor de initializare, fara parametri
+    ///constructor de initializare, fara parametri
+    Produs() : IDProdus{0}, Stoc{0}, Pret{0.0}{
         this->Denumire=new char[1];
         Denumire[0]='\0';
 
@@ -94,12 +95,12 @@ public:
     //operator-, definit special pentru afisarea denumirii unui produs, in cadrul afisarii clasei Comanda
     //am folosit operatorul - pentru a exersa supraincarcarea operatorilor
     //simbolul e folosit pentru a sugera "micsorarea" outputului de afisare a intregului obiect, comparativ cu op<<
-    friend std::ostream& operator-(std::ostream& os, const Produs& p) {
+    inline friend std::ostream& operator-(std::ostream& os, const Produs& p) {
         os<<"Denumire produs: "<<p.Denumire<<"; ";
         return os;
     }
     //getter Pret -> folosit la CalculeazaTotal()
-    //pentru a accesa o data membra privata intr o functie externa
+    //pentru a accesa o data membra privata
     double getPret() const {
         return this->Pret;
     }
@@ -122,13 +123,12 @@ class Comanda {
     bool StatusProcesare; //procesat-> 1; neprocesat-> 0
     Produs* Produse; //produsele corespunzatoare comenzii
     int* Cantitati;
-    int NrProduse;
-    //vector de intregi cu cantitati- un buchet nu poate avea decat un numar intreg de flori
+    int NrProduse; //al comenzii
     double Total; //actualizat separat prin metoda CalculeazaTotal()
-
+    static double PragTransportGratuit; //variabila comuna intregii clase, ce determina daca se mai adauga costurile de transport la calcul sumei de platit
 public:
     //constructor de initializare, fara parametri
-    Comanda(): IDComanda(0), NumeClient(nullptr), MetodaPlata(nullptr), StatusProcesare(false), Produse(nullptr), Cantitati(nullptr), NrProduse(0), Total(0.0) {}
+    Comanda(): IDComanda{0}, NumeClient{nullptr}, MetodaPlata{nullptr}, StatusProcesare{false}, Produse{nullptr}, Cantitati{nullptr}, NrProduse{0}, Total{0.0} {}
 
     ///constructor parametrizat, folosind lista de initializare
     ///StatusProcesare - valoare implicita false
@@ -145,7 +145,7 @@ public:
         Produse = new Produs[NrProduse];
         Cantitati=new int[NrProduse];
 
-        for (size_t i=0;i<NrProduse;i++) {
+        for (size_t i=0; i<NrProduse; i++) {
             Produse[i] = Produse_[i];
             Cantitati[i] = Cantitati_[i];
         }
@@ -215,7 +215,7 @@ public:
                     Cantitati[i] = other.Cantitati[i];
                 }
             }
-        else Cantitati=nullptr;
+            else Cantitati=nullptr;
         }
         return *this;
     }
@@ -251,6 +251,10 @@ public:
     //getter, folosit la ComenziDeLivrat()
     bool getStatus() const { return this->StatusProcesare;}
 
+    static double getPragTransport(){ return PragTransportGratuit;}
+
+    static void setPragtransport(double PragNou) {PragTransportGratuit=PragNou;}
+
     //metoda utilizata de Manager, dupa criterii proprii, avand ca utilitate modificarea totalului unei comenzi
     void AplicaReducere(int procent) {
         if (procent < 0 || procent > 100) return; // Validare minimă
@@ -280,8 +284,16 @@ public:
         for (size_t i=0; i < NrProduse; i++) { //pentru fiecare produs din comanda
             total+=Produse[i].getPret()*Cantitati[i]; //calcul al totalului
         }
-        return total;
+        int taxaTransport = 15;
+        return total+taxaTransport;
     }
+    static void AfiseazaPoliticaTransport() {
+        std::cout<<"\n--Politica Florariei--\n";
+        std::cout<<"Transportul este GRATUIT pentru comenzi de peste "<<PragTransportGratuit<<" RON.\n";
+        std::cout<<"Taxa de transport este de 15 RON.\n";
+    }
+
+
     //destructorul implicit
     ~Comanda() {
         delete[] NumeClient;
@@ -291,16 +303,17 @@ public:
     }
 
 };
+//inafara clasei Comanda, initializam variabila statica
+double Comanda::PragTransportGratuit=150.0;
 
 class Livrari {
     //comenzile acumulate in ziua curenta, continand date utile curierului
-    Comanda* Comenzi;
-        //obiecte de tip Comanda; conditie de apartenenta: campul statusProcesare == true
-    char** Adrese;
-        //adresele la care trebuie facuta livrarea
-    int NrComenzi;
-    char** NumeClienti;
-        //numele clientilor
+    Comanda* Comenzi; //obiecte de tip Comanda;
+    //conditie de apartenenta: campul statusProcesare == true
+    char** Adrese; //adresele la care trebuie facuta livrarea
+        //corespondenta indicilor cu *Comenzi este asigurata, pentru asociere directa
+    int NrComenzi; //dintr o livrare neverificata de ComenziDeLivrat()
+    char** NumeClienti; //numele clientilor
 public:
     //constructor parametrizat, cu lista de initializare
     Livrari(Comanda* Comenzi_, const char** Adrese_, const char** NumeClienti_, int NrComenzi_)
@@ -341,6 +354,7 @@ public:
             if (Livrare.Comenzi[index].getStatus()==true) {
                 std::cout<<Livrare.Comenzi[index].getNumeClient()<<" | ";
                 std::cout<<Livrare.Adrese[index]<<std::endl;
+                //nu s a folosit supraincarcarea operatorului<< pentru ca am fi avut nevoie de un al treilea parametru: indexul comenzii
             }
         }
     }
@@ -454,7 +468,9 @@ int main() {
     //////////////////////////  M E N I U    I N T E R A C T I V  //////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    std::cout<<"Bine ati venit!\n Selectati tipul de utilizator:\n[Client -> 0 | Manager -> 1 | Curier -> 2]\n";
+    std::cout<<"--Bine ati venit!--\n";
+    Comanda::AfiseazaPoliticaTransport();
+    std::cout<<"\nSelectati tipul de utilizator:\n[Client -> 0 | Manager -> 1 | Curier -> 2]\n\n";
     //input optiunea utilizatorului
     char tipUtilizator;
     std::cin>>tipUtilizator;
@@ -490,7 +506,7 @@ int main() {
                 break;
 
         //cazul Manager
-        case '1': std::cout<<"Bine ati venit, dle Manager! Selectati o optiune:\n [aplicaReducere() -> 0 | calculeazaIncasari() -> 1]";
+        case '1': std::cout<<"Bine ati venit, dle Manager! Selectati o optiune:\n [aplicaReducere() -> 0 | calculeazaIncasari() -> 1 | setPragTransport() -> 2]\n\n";
                 //preluare input utilizator - optiunea dorita
                 char inputManager; std::cin>>inputManager;
 
@@ -509,7 +525,7 @@ int main() {
 
                         //preluare procentul dorit
                         int procent;
-                        std::cout<<"Specificati procentul cu care sa fie redusa comanda aleasa: [type: int]";
+                        std::cout<<"Specificati procentul cu care sa fie redusa comanda aleasa: [type: int]\n\n";
                         std::cin>>procent;
 
                         //gasire comanda corespunzatoare indexului dat
@@ -531,7 +547,15 @@ int main() {
                     case '1':
                         std::cout<<"Ati selectat calculeazaIncasari(). Incasarile totale pentru ultima livrare inregistrata sunt:\n";
                         //apelul functiei, cu mesaj corespunzator
-                        std::cout<<Livrari::CalculeazaIncasari(liv)<<" RON";
+                        std::cout<<"-----"<<Livrari::CalculeazaIncasari(liv)<<" RON\n";
+                        break;
+                    case '2':
+                        std::cout<<"Ati selectat setPragTransport(). Pragul actual este "<<Comanda::getPragTransport()<<" RON.\n";
+                        std::cout<<"Introduceti noul prag:\n ";
+                        double PragNou;
+                        std::cin>>PragNou;
+                        Comanda::setPragtransport(PragNou);
+                        std::cout<<"Pragul actual este "<<Comanda::getPragTransport()<<".\n";
                         break;
 
                     //pentru orice alt input
@@ -561,6 +585,6 @@ int main() {
             //pentru orice alt input
         default: std::cout<<"\nNu exista aceasta optiune.";break;
     }
-    std::cout<<"\nVa uram o zi placuta!"; //mesaj de incheiere
+    std::cout<<"\nVa uram o zi placuta!\nPentru alte functionalitati, va rugam sa rulati din nou programul."; //mesaj de incheiere
     return 0;
 }

@@ -6,12 +6,19 @@ Student: Amarie Elena Carina, grupa 132, 2026
 ---
 
 ### Descrierea claselor implementate
-Presupunem existenta unei florarii care vinde buchete personalizate, trimise exclusiv prin livrare la adresa. Florile sunt reprezentate de obiecte din clasa `Produs`, avand specificate un identificator unic, denumirea florii, furnizorul, pretul si stocul disponibil. Clientul isi alege florile dorite si lanseaza o comanda, iar produsul final este un buchet cu toate aceste produse. O comanda poate avea un singur buchet; daca clientul isi doreste mai multe buchete, poate da mai multe comenzi. Comenzile sunt obiecte ale clasei `Comanda`, ce contine florile dorite, cantitatea dorita din fiecare produs, suma totala de platit, metoda de plata si statusul comenzii: procesat/neprocesat. Gestiunea comenzilor se face in functie de ziua in care a fost plasata comanda. Un obiect al clasei `Livrare` reprezinta totalul comenzilor plasate intr o zi, ce contine informatii utile pentru curier: comenzile destinate livrarii din ziua respectiva (depinzand de statusul comenzii), adresele de livrare corespunzatoare si numele clientilor. 
+Presupunem existenta unei florarii care vinde buchete personalizate, trimise exclusiv prin livrare la adresa. 
+Florile sunt reprezentate de obiecte din clasa `Produs`, avand specificate un **identificator unic**, **denumirea florii**, **furnizorul**, **pretul** si **stocul disponibil**. 
+Clientul isi alege florile dorite si lanseaza o **comanda**, iar produsul final este un **buchet** cu toate aceste produse. 
+O comanda poate avea un **singur buchet**; daca clientul isi doreste mai multe buchete, poate da mai multe comenzi. 
+Comenzile sunt obiecte ale clasei `Comanda`, ce contine **florile dorite**, **cantitatea dorita** din fiecare produs, **suma totala de platit**, **metoda de plata** si **statusul comenzii**: *procesat/neprocesat*. 
+Gestiunea comenzilor se face in functie de **ziua in care a fost plasata comanda**. 
+Un obiect al clasei `Livrare` reprezinta totalul comenzilor plasate intr o zi, ce contine informatii utile pentru curier: **comenzile destinate livrarii** din ziua respectiva (depinzand de statusul comenzii), **adresele de livrare** corespunzatoare si **numele clientilor**, pentru identificarea destinatarului. 
 
 ---
 
 ### Functionalitati
-Functionalitatile proiectului depind de tipul utilizatorului. Astfel, pentru Client, Manager si Curier, sunt listate optiunile de functionare in cadrul unui meniu interactiv.
+Functionalitatile proiectului depind de **tipul utilizatorului**. 
+Astfel, pentru *Client*, *Manager* si *Curier*, sunt listate optiunile de functionare in cadrul unui **meniu interactiv**.
   - **Client**
      - `friend void IstoricClient(const Livrari& Livrare, const std::string& Nume)`
          - istoricul comenzilor plasate, in functie de numele clientului
@@ -20,6 +27,9 @@ Functionalitatile proiectului depind de tipul utilizatorului. Astfel, pentru Cli
          - aplica reduceri anumitor comenzi, cu un procent dat (criteriile de acordare a reducerii sunt stabilite de promotia in curs a florariei)
      - `friend double CalculeazaIncasari(const Livrari& livrare);`
          - calculeaza totalul de incasari pentru ziua curenta
+     - `static void setPragtransport(double PragNou);`
+        - modifica suma minima pentru acordarea transportului gratuit
+        - pragul este unic pentru toate comenzile
   - **Curier**
      - `friend void ComenziDeLivrat(const Livrari& livrare);`
          - comenzile gata de livrat, impreuna cu toate informatiile necesare
@@ -27,7 +37,11 @@ Functionalitatile proiectului depind de tipul utilizatorului. Astfel, pentru Cli
 ---
 
 ### Rulare
-Datele de intrare sunt specificate in functia `int main()` a programului, acestea fiind: produsele de pe stoc (obiecte ale clasei `Produs`), cu atributele obligatorii specificate, comenzile lansate in ziua curenta (obiecte ale clasei `Comanda`), si o lista de livrari de efectuat (obiecte ale clasei `Livrare`), bazata pe comenzile procesate. La rulare, utilizatorul isi introduce optiunile, conform indicatiilor afisate.  
+Datele de intrare sunt specificate in functia `int main()` a programului, acestea fiind: 
+**produsele de pe stoc** (obiecte ale clasei `Produs`), cu atributele obligatorii specificate, 
+**comenzile lansate in ziua curenta** (obiecte ale clasei `Comanda`), 
+si **o lista de livrari de efectuat** (obiecte ale clasei `Livrare`), bazata pe comenzile procesate. 
+La rulare, utilizatorul isi introduce optiunile, conform indicatiilor afisate.  
 
 ---
 
